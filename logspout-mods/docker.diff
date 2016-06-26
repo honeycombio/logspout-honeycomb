@@ -1,0 +1,3 @@
+6a7,8
+> COPY ./build-logspout-honeycomb /go/src/github.com/honeycombio/logspout-honeycomb
+> COPY ./build-libhoney /go/src/github.com/honeycombio/libhoney-go
