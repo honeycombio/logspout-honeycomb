@@ -3,9 +3,11 @@ BUILD_DIR=build
 
 build:
 	mkdir $(BUILD_DIR)
+	# Clone Logspout code, which we need to build a Docker image.
 	git clone https://github.com/gliderlabs/logspout.git $(BUILD_DIR)/logspout
 	# Copy this repo's files into logspout checkout, so it can find them for
-	# its Docker build.
+	# its Docker build. Otherwise, 'go get' fails to checkout our private
+	# repos because it can't auth in the Docker container.
 	mkdir $(BUILD_DIR)/logspout/build-logspout-honeycomb
 	cp -v *.go $(BUILD_DIR)/logspout/build-logspout-honeycomb/.
 	mkdir $(BUILD_DIR)/logspout/build-libhound
@@ -17,6 +19,7 @@ build:
 	docker build $(BUILD_DIR)/logspout -t logspout-honeycomb
 
 run: build
+	# Fire up a container with the Honeycomb Logspout adapter in it
 	docker run \
 		-e "ROUTE_URIS=honeycomb://localhost" \
 		--volume=/var/run/docker.sock:/var/run/docker.sock \
