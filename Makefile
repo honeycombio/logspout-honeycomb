@@ -16,5 +16,12 @@ build:
 	cp -v logspout-mods/modules.go $(BUILD_DIR)/logspout/.
 	docker build $(BUILD_DIR)/logspout -t logspout-honeycomb
 
+run: build
+	docker run \
+		-e "ROUTE_URIS=honeycomb://localhost" \
+		--volume=/var/run/docker.sock:/var/run/docker.sock \
+		--publish=127.0.0.1:8000:80 \
+		honeycomb-logspout
+
 clean:
 	rm -rf $(BUILD_DIR)
