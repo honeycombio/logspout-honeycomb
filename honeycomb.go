@@ -2,7 +2,7 @@ package honeycomb
 
 import (
 	"encoding/json"
-	"errors"
+	//	"errors"
 	"log"
 	"net"
 
@@ -11,6 +11,7 @@ import (
 )
 
 func init() {
+	log.Println("init")
 	router.AdapterFactories.Register(NewHoneycombAdapter, "honeycomb")
 }
 
@@ -38,6 +39,7 @@ func NewHoneycombAdapter(route *router.Route) (router.LogAdapter, error) {
 		WriteKey: "09f5607ab2ae0aba7fe5f38ce091feb2",
 		Dataset:  "ohai",
 	})
+	log.Println("init libhound")
 
 	return &HoneycombAdapter{}, nil
 }
@@ -45,56 +47,48 @@ func NewHoneycombAdapter(route *router.Route) (router.LogAdapter, error) {
 // Stream implements the router.LogAdapter interface.
 func (a *HoneycombAdapter) Stream(logstream chan *router.Message) {
 	for m := range logstream {
-		dockerInfo := DockerInfo{
-			Name:     m.Container.Name,
-			ID:       m.Container.ID,
-			Image:    m.Container.Config.Image,
-			Hostname: m.Container.Config.Hostname,
+		var js []byte
+		var data map[string]interface{}
+		if err := json.Unmarshal([]byte(m.Data), &data); err != nil {
+			log.Println("message was JSON")
+			// The message is not in JSON, make a new JSON message.
+			msg := HoneycombMessage{
+				Message:              m.Data,
+				Stream:               m.Source,
+				DockerContainerName:  m.Container.Name,
+				DockerContainerID:    m.Container.ID,
+				DockerHostname:       m.Container.Config.Hostname,
+				DockerContainerImage: m.Container.Config.Image,
+			}
+			if js, err = json.Marshal(msg); err != nil {
+				log.Println("logstash:", err)
+				continue
+			}
+		} else {
+			log.Println("message was not JSON")
+			// The message is already in JSON, add the docker specific fields.
+			data["dockerContainerName"] = m.Container.Name
+			data["dockerContainerId"] = m.Container.ID
+			data["dockerHostname"] = m.Container.Config.Hostname
+			data["dockerImage"] = m.Container.Config.Image
+
+			if js, err = json.Marshal(data); err != nil {
+				log.Println("logstash:", err)
+				continue
+			}
 		}
 
-		libhound.SendNow(m)
-
-		/*
-			var js []byte
-			var data map[string]interface{}
-			if err := json.Unmarshal([]byte(m.Data), &data); err != nil {
-				// The message is not in JSON, make a new JSON message.
-				msg := LogstashMessage{
-					Message: m.Data,
-					Docker:  dockerInfo,
-					Stream:  m.Source,
-				}
-				if js, err = json.Marshal(msg); err != nil {
-					log.Println("logstash:", err)
-					continue
-				}
-			} else {
-				// The message is already in JSON, add the docker specific fields.
-				data["docker"] = dockerInfo
-				if js, err = json.Marshal(data); err != nil {
-					log.Println("logstash:", err)
-					continue
-				}
-			}
-
-			if _, err := a.conn.Write(js); err != nil {
-				log.Fatal("logstash:", err)
-			}
-		*/
+		log.Println("sending to honeycomb.")
+		libhound.SendNow(js)
 	}
 }
 
-// DockerInfo  Hey, here's a comment to satisfy the linter
-type DockerInfo struct {
-	Name     string `json:"name"`
-	ID       string `json:"id"`
-	Image    string `json:"image"`
-	Hostname string `json:"hostname"`
-}
-
-// LogstashMessage is a simple JSON input to Logstash.
-type LogstashMessage struct {
-	Message string     `json:"message"`
-	Stream  string     `json:"stream"`
-	Docker  DockerInfo `json:"docker"`
+// HoneycombMessage is a flat JSON object sent to the Honeycomb service
+type HoneycombMessage struct {
+	Message              string `json:"message"`
+	Stream               string `json:"stream"`
+	DockerHostname       string `json:"dockerHostname"`
+	DockerContainerName  string `json:"dockerContainerName"`
+	DockerContainerID    string `json:"dockerContainerId"`
+	DockerContainerImage string `json:"dockerImage"`
 }
