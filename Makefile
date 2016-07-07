@@ -1,7 +1,7 @@
 NAME=logspout-honeycomb
 BUILD_DIR=build
 
-build:
+build: honeycomb.go
 	mkdir $(BUILD_DIR)
 	# Clone Logspout code, which we need to build a Docker image.
 	git clone https://github.com/gliderlabs/logspout.git $(BUILD_DIR)/logspout
@@ -16,7 +16,7 @@ build:
 	patch $(BUILD_DIR)/logspout/Dockerfile < logspout-mods/docker.diff
 	# Modify Logspout module file to use Honeycomb adapter
 	cp -v logspout-mods/modules.go $(BUILD_DIR)/logspout/.
-	docker build $(BUILD_DIR)/logspout -t logspout-honeycomb
+	docker build $(BUILD_DIR)/logspout -t $(NAME)
 
 run: build
 	# Fire up a container with the Honeycomb Logspout adapter in it
@@ -24,7 +24,8 @@ run: build
 		-e "ROUTE_URIS=honeycomb://localhost" \
 		--volume=/var/run/docker.sock:/var/run/docker.sock \
 		--publish=127.0.0.1:8000:80 \
-		honeycomb-logspout
+		$(NAME)
 
 clean:
 	rm -rf $(BUILD_DIR)
+	docker rmi -f $(NAME)
