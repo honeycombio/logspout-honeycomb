@@ -22,6 +22,8 @@ run: build
 	# Fire up a container with the Honeycomb Logspout adapter in it
 	docker run \
 		-e "ROUTE_URIS=honeycomb://localhost" \
+		-e "HONEYCOMB_WRITE_KEY=09f5607ab2ae0aba7fe5f38ce091feb2" \
+		-e "HONEYCOMB_DATASET=ohai3" \
 		--volume=/var/run/docker.sock:/var/run/docker.sock \
 		--publish=127.0.0.1:8000:80 \
 		$(NAME)

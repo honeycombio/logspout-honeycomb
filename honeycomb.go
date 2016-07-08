@@ -3,13 +3,13 @@ package honeycomb
 import (
 	"log"
 	"net"
+	"os"
 
 	"github.com/gliderlabs/logspout/router"
 	"github.com/houndsh/libhound-go-private"
 )
 
 func init() {
-	log.Println("init")
 	router.AdapterFactories.Register(NewHoneycombAdapter, "honeycomb")
 }
 
@@ -22,8 +22,8 @@ type HoneycombAdapter struct {
 // NewHoneycombAdapter creates a HoneycombAdapter
 func NewHoneycombAdapter(route *router.Route) (router.LogAdapter, error) {
 	libhound.Init(libhound.Config{
-		WriteKey: "09f5607ab2ae0aba7fe5f38ce091feb2",
-		Dataset:  "ohai2",
+		WriteKey: os.Getenv("HONEYCOMB_WRITE_KEY"),
+		Dataset:  os.Getenv("HONEYCOMB_DATASET"),
 	})
 
 	return &HoneycombAdapter{}, nil
