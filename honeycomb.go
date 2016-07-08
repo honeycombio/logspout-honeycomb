@@ -38,7 +38,7 @@ func (a *HoneycombAdapter) Stream(logstream chan *router.Message) {
 		if err := json.Unmarshal([]byte(m.Data), &data); err != nil {
 			// The message is not in JSON, make a new JSON message.
 			msg := HoneycombMessage{
-				Data:                 m.Data,
+				Message:              m.Data,
 				Stream:               m.Source,
 				DockerContainerName:  m.Container.Name,
 				DockerContainerID:    m.Container.ID,
@@ -66,7 +66,7 @@ func (a *HoneycombAdapter) Stream(logstream chan *router.Message) {
 
 // HoneycombMessage is a flat JSON object sent to the Honeycomb service
 type HoneycombMessage struct {
-	Data                 string `json:"data"`
+	Message              string `json:"message"`
 	Stream               string `json:"stream"`
 	DockerHostname       string `json:"logspout_hostname"`
 	DockerContainerName  string `json:"logspout_container"`
