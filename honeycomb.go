@@ -22,9 +22,25 @@ type HoneycombAdapter struct {
 
 // NewHoneycombAdapter creates a HoneycombAdapter
 func NewHoneycombAdapter(route *router.Route) (router.LogAdapter, error) {
+	writeKey := route.Options["writeKey"]
+	if writeKey == "" {
+		writeKey = os.Getenv("HONEYCOMB_WRITE_KEY")
+	}
+	if writeKey == "" {
+		log.Fatal("Must provide Honeycomb WriteKey.")
+	}
+
+	dataset := route.Options["dataset"]
+	if dataset == "" {
+		dataset = os.Getenv("HONEYCOMB_DATASET")
+	}
+	if dataset == "" {
+		log.Fatal("Must provide Honeycomb Dataset.")
+	}
+
 	libhound.Init(libhound.Config{
-		WriteKey: os.Getenv("HONEYCOMB_WRITE_KEY"),
-		Dataset:  os.Getenv("HONEYCOMB_DATASET"),
+		WriteKey: writeKey,
+		Dataset:  dataset,
 	})
 
 	return &HoneycombAdapter{}, nil

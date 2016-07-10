@@ -1,6 +1,11 @@
 NAME=logspout-honeycomb
 BUILD_DIR=build
 
+# If you want to configure the Honeycomb Logspout adapter with environment
+# variables, set them here. Otherwise you need to use the RoutesAPI.
+HONEYCOMB_WRITE_KEY=09f5607ab2ae0aba7fe5f38ce091feb2
+HONEYCOMB_DATASET=ohai3
+
 build: honeycomb.go
 	mkdir $(BUILD_DIR)
 	# Clone Logspout code, which we need to build a Docker image.
@@ -18,12 +23,20 @@ build: honeycomb.go
 	cp -v logspout-mods/modules.go $(BUILD_DIR)/logspout/.
 	docker build $(BUILD_DIR)/logspout -t $(NAME)
 
+run-with-env: build
+	# Fire up a container with the Honeycomb Logspout adapter in it,
+	# configured by environment variables
+	docker run \
+		-e "ROUTE_URIS=honeycomb://localhost" \
+		-e "HONEYCOMB_WRITE_KEY=$(HONEYCOMB_WRITE_KEY)" \
+		-e "HONEYCOMB_DATASET=$(HOENYCOMB_DATASET)" \
+		--volume=/var/run/docker.sock:/var/run/docker.sock \
+		--publish=127.0.0.1:8000:80 \
+		$(NAME)
+
 run: build
 	# Fire up a container with the Honeycomb Logspout adapter in it
 	docker run \
-		-e "ROUTE_URIS=honeycomb://localhost" \
-		-e "HONEYCOMB_WRITE_KEY=09f5607ab2ae0aba7fe5f38ce091feb2" \
-		-e "HONEYCOMB_DATASET=ohai3" \
 		--volume=/var/run/docker.sock:/var/run/docker.sock \
 		--publish=127.0.0.1:8000:80 \
 		$(NAME)
@@ -31,3 +44,6 @@ run: build
 clean:
 	rm -rf $(BUILD_DIR)
 	docker rmi -f $(NAME)
+
+clean-images:
+	docker images | grep none | awk '{print $3}' | xargs docker rmi -f
