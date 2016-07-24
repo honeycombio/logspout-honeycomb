@@ -26,7 +26,7 @@ build: honeycomb.go
 
 # Fire up a container with the Honeycomb Logspout adapter in it,
 # configured by environment variables
-run-with-env: build
+run-with-env: 
 	docker run \
 		-e "ROUTE_URIS=honeycomb://localhost" \
 		-e "HONEYCOMB_WRITE_KEY=$(HONEYCOMB_WRITE_KEY)" \
@@ -36,7 +36,7 @@ run-with-env: build
 		$(NAME)
 
 # Fire up a container with the Honeycomb Logspout adapter in it
-run: build
+run:
 	docker run \
 		--volume=/var/run/docker.sock:/var/run/docker.sock \
 		--publish=127.0.0.1:8000:80 \
@@ -44,8 +44,8 @@ run: build
 
 # Launches a Docker image that logs random JSON messages every second
 random-source:
-	docker run -d alpine /bin/sh -c \
-		'while true; do echo {\"random\": `echo $RANDOM`}; sleep 1; done'
+	docker run alpine /bin/sh -c \
+		'while true; do echo {\"random\": `echo $$RANDOM`}; sleep 1; done'
 
 clean:
 	rm -rf $(BUILD_DIR)
