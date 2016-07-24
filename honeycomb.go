@@ -2,9 +2,11 @@ package honeycomb
 
 import (
 	"encoding/json"
+	"errors"
 	"log"
 	"net"
 	"os"
+	"strconv"
 
 	"github.com/gliderlabs/logspout/router"
 	"github.com/houndsh/libhound-go-private"
@@ -28,6 +30,7 @@ func NewHoneycombAdapter(route *router.Route) (router.LogAdapter, error) {
 	}
 	if writeKey == "" {
 		log.Fatal("Must provide Honeycomb WriteKey.")
+		return nil, errors.New("Honeycomb 'WriteKey' was not provided.")
 	}
 
 	dataset := route.Options["dataset"]
@@ -36,11 +39,33 @@ func NewHoneycombAdapter(route *router.Route) (router.LogAdapter, error) {
 	}
 	if dataset == "" {
 		log.Fatal("Must provide Honeycomb Dataset.")
+		return nil, errors.New("Honeycomb 'Dataset' was not provided.")
+	}
+
+	honeycombApiUrl := route.Options["apiUrl"]
+	if honeycombApiUrl == "" {
+		honeycombApiUrl = os.Getenv("HONEYCOMB_API_URL")
+	}
+
+	var sampleRate uint = 0
+	sampleRateString := route.Options["sampleRate"]
+	if sampleRateString == "" {
+		sampleRateString = os.Getenv("HONEYCOMB_SAMPLE_RATE")
+	}
+	if sampleRateString != "" {
+		parsedSampleRate, err := strconv.ParseUint(sampleRateString, 10, 32)
+		if err != nil {
+			log.Fatal("Must provide Honeycomb SampleRate.")
+			return nil, errors.New("Honeycomb 'SampleRate' must be an integer.")
+		}
+		sampleRate = uint(parsedSampleRate)
 	}
 
 	libhound.Init(libhound.Config{
-		WriteKey: writeKey,
-		Dataset:  dataset,
+		WriteKey:   writeKey,
+		Dataset:    dataset,
+		URL:        honeycombApiUrl,
+		SampleRate: sampleRate,
 	})
 
 	return &HoneycombAdapter{}, nil
