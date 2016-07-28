@@ -7,7 +7,7 @@ HONEYCOMB_WRITE_KEY=09f5607ab2ae0aba7fe5f38ce091feb2
 HONEYCOMB_DATASET=random1
 
 # Builds a Docker image of LogSpout with the Honeycomb adapter included.
-build: honeycomb.go
+docker: honeycomb.go
 	mkdir $(BUILD_DIR)
 	# Clone Logspout code, which we need to build a Docker image.
 	git clone https://github.com/gliderlabs/logspout.git $(BUILD_DIR)/logspout
