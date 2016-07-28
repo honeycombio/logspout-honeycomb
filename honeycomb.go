@@ -9,7 +9,7 @@ import (
 	"strconv"
 
 	"github.com/gliderlabs/logspout/router"
-	"github.com/houndsh/libhound-go-private"
+	"github.com/honeycombio/libhoney-go-private"
 )
 
 func init() {
@@ -61,7 +61,7 @@ func NewHoneycombAdapter(route *router.Route) (router.LogAdapter, error) {
 		sampleRate = uint(parsedSampleRate)
 	}
 
-	libhound.Init(libhound.Config{
+	libhoney.Init(libhoney.Config{
 		WriteKey:   writeKey,
 		Dataset:    dataset,
 		URL:        honeycombApiUrl,
@@ -89,7 +89,7 @@ func (a *HoneycombAdapter) Stream(logstream chan *router.Message) {
 		data["logspout_hostname"] = m.Container.Config.Hostname
 		data["logspout_docker_image"] = m.Container.Config.Image
 
-		if err := libhound.SendNow(data); err != nil {
+		if err := libhoney.SendNow(data); err != nil {
 			log.Println("error: ", err)
 		}
 	}

@@ -20,9 +20,9 @@ Docker, or by using the [LogSpout RoutesAPI](https://github.com/gliderlabs/logsp
 
     docker run \
         -e "ROUTE_URIS=honeycomb://localhost" \
-        -e "HONEYCOMB_WRITE_KEY=__abcdefg12345678__" \
-        -e "HONEYCOMB_DATASET=__myDataset__" \
-        -e "HONEYCOMB_SAMPLE_RATE=__10__" \
+        -e "HONEYCOMB_WRITE_KEY=abcdefg12345678" \
+        -e "HONEYCOMB_DATASET=myDataset" \
+        -e "HONEYCOMB_SAMPLE_RATE=10" \
         -e "HONEYCOMB_API_URL=https://api.hound.sh" \
         --volume=/var/run/docker.sock:/var/run/docker.sock \
         --publish=127.0.0.1:8000:80 \
@@ -34,6 +34,6 @@ Docker, or by using the [LogSpout RoutesAPI](https://github.com/gliderlabs/logsp
         -X POST \
             -d '{"adapter": "honeycomb",
                  "address": "honeycomb://localhost",
-                 "options": {"writeKey":"__abcdefg12345678__",
-                             "dataset":"__mydataset__",
-                             "sampleRate":__10__}}'
+                 "options": {"writeKey":"abcdefg12345678",
+                             "dataset":"mydataset",
+                             "sampleRate":10}}'
