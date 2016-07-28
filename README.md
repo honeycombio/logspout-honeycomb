@@ -1,5 +1,5 @@
 # logspout-honeycomb
-Honeycomb adapter for LogSpout
+Honeycomb adapter for LogSpout.
 
 # Building
 
