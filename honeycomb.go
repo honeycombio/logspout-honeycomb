@@ -5,9 +5,11 @@ import (
 	"errors"
 	"log"
 	"net"
+	"os"
+	"strconv"
 
 	"github.com/gliderlabs/logspout/router"
-	"github.com/houndsh/libhound-go-private"
+	"github.com/honeycombio/libhoney-go-private"
 )
 
 func init() {
@@ -22,21 +24,48 @@ type HoneycombAdapter struct {
 
 // NewHoneycombAdapter creates a HoneycombAdapter
 func NewHoneycombAdapter(route *router.Route) (router.LogAdapter, error) {
-	/*
-		transport, found := router.AdapterTransports.Lookup(route.AdapterTransport("tls"))
-		if !found {
-			return nil, errors.New("unable to find adapter: " + route.Adapter)
-		}
+	writeKey := route.Options["writeKey"]
+	if writeKey == "" {
+		writeKey = os.Getenv("HONEYCOMB_WRITE_KEY")
+	}
+	if writeKey == "" {
+		log.Fatal("Must provide Honeycomb WriteKey.")
+		return nil, errors.New("Honeycomb 'WriteKey' was not provided.")
+	}
 
-		conn, err := transport.Dial(route.Address, route.Options)
+	dataset := route.Options["dataset"]
+	if dataset == "" {
+		dataset = os.Getenv("HONEYCOMB_DATASET")
+	}
+	if dataset == "" {
+		log.Fatal("Must provide Honeycomb Dataset.")
+		return nil, errors.New("Honeycomb 'Dataset' was not provided.")
+	}
+
+	honeycombApiUrl := route.Options["apiUrl"]
+	if honeycombApiUrl == "" {
+		honeycombApiUrl = os.Getenv("HONEYCOMB_API_URL")
+	}
+
+	var sampleRate uint = 0
+	sampleRateString := route.Options["sampleRate"]
+	if sampleRateString == "" {
+		sampleRateString = os.Getenv("HONEYCOMB_SAMPLE_RATE")
+	}
+	if sampleRateString != "" {
+		parsedSampleRate, err := strconv.ParseUint(sampleRateString, 10, 32)
 		if err != nil {
-			return nil, err
+			log.Fatal("Must provide Honeycomb SampleRate.")
+			return nil, errors.New("Honeycomb 'SampleRate' must be an integer.")
 		}
-	*/
+		sampleRate = uint(parsedSampleRate)
+	}
 
-	libhound.Init(libhound.Config{
-		WriteKey: "09f5607ab2ae0aba7fe5f38ce091feb2",
-		Dataset:  "ohai",
+	libhoney.Init(libhoney.Config{
+		WriteKey:   writeKey,
+		Dataset:    dataset,
+		URL:        honeycombApiUrl,
+		SampleRate: sampleRate,
 	})
 
 	return &HoneycombAdapter{}, nil
@@ -45,56 +74,23 @@ func NewHoneycombAdapter(route *router.Route) (router.LogAdapter, error) {
 // Stream implements the router.LogAdapter interface.
 func (a *HoneycombAdapter) Stream(logstream chan *router.Message) {
 	for m := range logstream {
-		dockerInfo := DockerInfo{
-			Name:     m.Container.Name,
-			ID:       m.Container.ID,
-			Image:    m.Container.Config.Image,
-			Hostname: m.Container.Config.Hostname,
+
+		var data map[string]interface{}
+		if err := json.Unmarshal([]byte(m.Data), &data); err != nil {
+			// The message is not in JSON.
+			// Capture the log line and stash it in "message".
+			data = make(map[string]interface{})
+			data["message"] = m.Data
 		}
+		// The message is already in JSON, add the docker specific fields.
+		data["stream"] = m.Source
+		data["logspout_container"] = m.Container.Name
+		data["logspout_container_id"] = m.Container.ID
+		data["logspout_hostname"] = m.Container.Config.Hostname
+		data["logspout_docker_image"] = m.Container.Config.Image
 
-		libhound.SendNow(m)
-
-		/*
-			var js []byte
-			var data map[string]interface{}
-			if err := json.Unmarshal([]byte(m.Data), &data); err != nil {
-				// The message is not in JSON, make a new JSON message.
-				msg := LogstashMessage{
-					Message: m.Data,
-					Docker:  dockerInfo,
-					Stream:  m.Source,
-				}
-				if js, err = json.Marshal(msg); err != nil {
-					log.Println("logstash:", err)
-					continue
-				}
-			} else {
-				// The message is already in JSON, add the docker specific fields.
-				data["docker"] = dockerInfo
-				if js, err = json.Marshal(data); err != nil {
-					log.Println("logstash:", err)
-					continue
-				}
-			}
-
-			if _, err := a.conn.Write(js); err != nil {
-				log.Fatal("logstash:", err)
-			}
-		*/
+		if err := libhoney.SendNow(data); err != nil {
+			log.Println("error: ", err)
+		}
 	}
-}
-
-// DockerInfo  Hey, here's a comment to satisfy the linter
-type DockerInfo struct {
-	Name     string `json:"name"`
-	ID       string `json:"id"`
-	Image    string `json:"image"`
-	Hostname string `json:"hostname"`
-}
-
-// LogstashMessage is a simple JSON input to Logstash.
-type LogstashMessage struct {
-	Message string     `json:"message"`
-	Stream  string     `json:"stream"`
-	Docker  DockerInfo `json:"docker"`
 }
