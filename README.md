@@ -23,7 +23,7 @@ Docker, or by using the [LogSpout RoutesAPI](https://github.com/gliderlabs/logsp
         -e "HONEYCOMB_WRITE_KEY=abcdefg12345678" \
         -e "HONEYCOMB_DATASET=myDataset" \
         -e "HONEYCOMB_SAMPLE_RATE=10" \
-        -e "HONEYCOMB_API_URL=https://api.hound.sh" \
+        -e "HONEYCOMB_API_URL=https://api.honeycomb.io" \
         --volume=/var/run/docker.sock:/var/run/docker.sock \
         --publish=127.0.0.1:8000:80 \
         logspout-honeycomb
