@@ -3,8 +3,8 @@ BUILD_DIR=build
 
 # If you want to configure the Honeycomb Logspout adapter with environment
 # variables, set them here. Otherwise you need to use the RoutesAPI.
-HONEYCOMB_WRITE_KEY=09f5607ab2ae0aba7fe5f38ce091feb2
-HONEYCOMB_DATASET=random1
+HONEYCOMB_WRITE_KEY=
+HONEYCOMB_DATASET=
 
 # Builds a Docker image of LogSpout with the Honeycomb adapter included.
 docker: honeycomb.go
