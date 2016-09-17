@@ -9,7 +9,7 @@ import (
 	"strconv"
 
 	"github.com/gliderlabs/logspout/router"
-	"github.com/honeycombio/libhoney-go-private"
+	"github.com/honeycombio/libhoney-go"
 )
 
 func init() {
@@ -64,7 +64,7 @@ func NewHoneycombAdapter(route *router.Route) (router.LogAdapter, error) {
 	libhoney.Init(libhoney.Config{
 		WriteKey:   writeKey,
 		Dataset:    dataset,
-		URL:        honeycombApiUrl,
+		APIHost:    honeycombApiUrl,
 		SampleRate: sampleRate,
 	})
 
