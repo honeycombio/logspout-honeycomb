@@ -16,8 +16,8 @@ docker: honeycomb.go
 	# repos because it can't auth in the Docker container.
 	mkdir $(BUILD_DIR)/logspout/build-logspout-honeycomb
 	cp -v *.go $(BUILD_DIR)/logspout/build-logspout-honeycomb/.
-	mkdir $(BUILD_DIR)/logspout/build-libhound
-	cp -rv ../libhound-go-private/* $(BUILD_DIR)/logspout/build-libhound
+	mkdir $(BUILD_DIR)/logspout/build-libhoney
+	cp -rv ../libhoney-go/* $(BUILD_DIR)/logspout/build-libhoney
 	# Modify the Docker build to copy in our private repos
 	patch $(BUILD_DIR)/logspout/Dockerfile < logspout-mods/docker.diff
 	# Modify Logspout module file to use Honeycomb adapter
