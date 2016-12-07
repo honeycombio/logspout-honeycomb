@@ -12,6 +12,11 @@ import (
 	"github.com/honeycombio/libhoney-go"
 )
 
+const (
+	DefaultHoneycombAPIURL = "https://api.honeycomb.io"
+	DefaultSampleRate      = 10
+)
+
 func init() {
 	router.AdapterFactories.Register(NewHoneycombAdapter, "honeycomb")
 }
@@ -42,12 +47,15 @@ func NewHoneycombAdapter(route *router.Route) (router.LogAdapter, error) {
 		return nil, errors.New("Honeycomb 'Dataset' was not provided.")
 	}
 
-	honeycombApiUrl := route.Options["apiUrl"]
-	if honeycombApiUrl == "" {
-		honeycombApiUrl = os.Getenv("HONEYCOMB_API_URL")
+	honeycombAPIURL := route.Options["apiUrl"]
+	if honeycombAPIURL == "" {
+		honeycombAPIURL = os.Getenv("HONEYCOMB_API_URL")
+	}
+	if honeycombAPIURL == "" {
+		honeycombAPIURL = DefaultHoneycombAPIURL
 	}
 
-	var sampleRate uint = 0
+	var sampleRate uint = DefaultSampleRate
 	sampleRateString := route.Options["sampleRate"]
 	if sampleRateString == "" {
 		sampleRateString = os.Getenv("HONEYCOMB_SAMPLE_RATE")
@@ -64,7 +72,7 @@ func NewHoneycombAdapter(route *router.Route) (router.LogAdapter, error) {
 	libhoney.Init(libhoney.Config{
 		WriteKey:   writeKey,
 		Dataset:    dataset,
-		APIHost:    honeycombApiUrl,
+		APIHost:    honeycombAPIURL,
 		SampleRate: sampleRate,
 	})
 
