@@ -1,39 +1,45 @@
 # logspout-honeycomb
-Honeycomb adapter for LogSpout.
+Honeycomb adapter for Logspout. More documentation can be found [in Honeycomb docs](https://honeycomb.io/docs/send-data/connectors/logspout).
 
 # Building
 
-To build the Honeycomb LogSpout Docker image, run:
+To build the Honeycomb Logspout Docker image, run:
 * `make docker`
 
-# Configuration
+# Configuration and invocation
 
 This module can be configured either by setting environment variables in
-Docker, or by using the [LogSpout RoutesAPI](https://github.com/gliderlabs/logspout/tree/master/routesapi). There are 4 variables to consider:
+Docker, or by using the [Logspout routesapi](https://github.com/gliderlabs/logspout/tree/master/routesapi). The following variables are available:
 
-* `WriteKey` (string) Your Honeycomb account's API key.
-* `Dataset` (string) The name of the destination dataset in your Honeycomb account. It will be created if it does not already exist.
-* `SampleRate` (optional, integer) Only send 1 out of N events
-* `ApiUrl` (optional, URL string) An alternate Honeycomb API endpoint to send events to. Debugging purposes only.
+Env. Variable | routesapi key | Type | Required? | Description |
+| --- | --- | --- | --- | -----|
+| `HONEYCOMB_WRITE_KEY` | `writeKey` | string | required | Your Honeycomb team's write key. |
+| `HONEYCOMB_DATASET` | `dataset` | string | required | The name of the destination dataset in your Honeycomb account. It will be created if it does not already exist. |
+| `HONEYCOMB_SAMPLE_RATE` | `sampleRate` | integer | optional | Sample your event stream: send 1 out of every N events |
 
-## Environment variables
+### Environment variables
+
+Configure the logspout-honeycomb image via environment variables and run the container:
 
     docker run \
         -e "ROUTE_URIS=honeycomb://localhost" \
-        -e "HONEYCOMB_WRITE_KEY=abcdefg12345678" \
-        -e "HONEYCOMB_DATASET=myDataset" \
-        -e "HONEYCOMB_SAMPLE_RATE=10" \
-        -e "HONEYCOMB_API_URL=https://api.honeycomb.io" \
+        -e "HONEYCOMB_WRITE_KEY=<YOUR_WRITE_KEY>" \
+        -e "HONEYCOMB_DATASET=<YOUR_DATASET>" \
         --volume=/var/run/docker.sock:/var/run/docker.sock \
         --publish=127.0.0.1:8000:80 \
         logspout-honeycomb
 
-## RoutesAPI
+### routesapi
+
+Configure the logspout-honeycomb image via routesapi and run the container:
 
     curl $(docker port `docker ps -lq` 80)/routes \
         -X POST \
             -d '{"adapter": "honeycomb",
                  "address": "honeycomb://localhost",
-                 "options": {"writeKey":"abcdefg12345678",
-                             "dataset":"mydataset",
-                             "sampleRate":10}}'
+                 "options": {"writeKey":"<YOUR_WRITE_KEY>",
+                             "dataset":"<YOUR_DATASET>"}}'
+    docker run \
+        --volume=/var/run/docker.sock:/var/run/docker.sock \
+        --publish=127.0.0.1:8000:80 \
+        logspout-honeycomb
