@@ -8,7 +8,7 @@ HONEYCOMB_DATASET=
 
 # Builds a Docker image of LogSpout with the Honeycomb adapter included.
 docker: honeycomb.go
-	docker build -t $(NAME) .
+	docker build -t $(NAME) docker
 
 # Fire up a container with the Honeycomb Logspout adapter in it,
 # configured by environment variables
