@@ -7,8 +7,8 @@ HONEYCOMB_WRITE_KEY=
 HONEYCOMB_DATASET=
 
 # Builds a Docker image of LogSpout with the Honeycomb adapter included.
-docker: honeycomb.go
-	docker build -t $(NAME) .
+docker:
+	docker build -t $(NAME) image
 
 # Fire up a container with the Honeycomb Logspout adapter in it,
 # configured by environment variables
