@@ -8,24 +8,11 @@ HONEYCOMB_DATASET=
 
 # Builds a Docker image of LogSpout with the Honeycomb adapter included.
 docker: honeycomb.go
-	mkdir $(BUILD_DIR)
-	# Clone Logspout code, which we need to build a Docker image.
-	git clone https://github.com/gliderlabs/logspout.git $(BUILD_DIR)/logspout
-	# Copy this repo's files into logspout checkout, so it can find them for
-	# its Docker build. Otherwise, 'go get' fails to checkout our private
-	# repos because it can't auth in the Docker container.
-	mkdir $(BUILD_DIR)/logspout/build-logspout-honeycomb
-	cp -v *.go $(BUILD_DIR)/logspout/build-logspout-honeycomb/.
-	git clone https://github.com/honeycombio/libhoney-go $(BUILD_DIR)/logspout/build-libhoney/
-	# Modify the Docker build to copy in our private repos
-	patch $(BUILD_DIR)/logspout/Dockerfile < logspout-mods/docker.diff
-	# Modify Logspout module file to use Honeycomb adapter
-	cp -v logspout-mods/modules.go $(BUILD_DIR)/logspout/.
-	docker build $(BUILD_DIR)/logspout -t $(NAME)
+	docker build -t $(NAME) .
 
 # Fire up a container with the Honeycomb Logspout adapter in it,
 # configured by environment variables
-run-with-env: 
+run-with-env:
 	docker run \
 		-e "ROUTE_URIS=honeycomb://localhost" \
 		-e "HONEYCOMB_WRITE_KEY=$(HONEYCOMB_WRITE_KEY)" \
