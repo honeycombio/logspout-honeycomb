@@ -81,6 +81,10 @@ func NewHoneycombAdapter(route *router.Route) (router.LogAdapter, error) {
 
 // Stream implements the router.LogAdapter interface.
 func (a *HoneycombAdapter) Stream(logstream chan *router.Message) {
+	hostname, err := os.Hostname()
+	if err != nil {
+		log.Println("error getting hostname", err)
+	}
 	for m := range logstream {
 
 		var data map[string]interface{}
@@ -96,6 +100,7 @@ func (a *HoneycombAdapter) Stream(logstream chan *router.Message) {
 		data["logspout_container_id"] = m.Container.ID
 		data["logspout_hostname"] = m.Container.Config.Hostname
 		data["logspout_docker_image"] = m.Container.Config.Image
+		data["router_hostname"] = hostname
 
 		if err := libhoney.SendNow(data); err != nil {
 			log.Println("error: ", err)
