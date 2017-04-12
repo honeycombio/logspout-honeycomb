@@ -19,6 +19,7 @@ const (
 
 func init() {
 	router.AdapterFactories.Register(NewHoneycombAdapter, "honeycomb")
+	libhoney.UserAgentAddition = "logspout-honeycomb"
 }
 
 // HoneycombAdapter is an adapter that streams JSON to Logstash.
