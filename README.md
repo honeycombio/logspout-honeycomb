@@ -1,5 +1,5 @@
 # logspout-honeycomb
-Honeycomb adapter for Logspout. More documentation can be found [in Honeycomb docs](https://honeycomb.io/docs/send-data/connectors/logspout).
+Honeycomb adapter for Logspout. More documentation can be found [in Honeycomb docs](https://honeycomb.io/docs/connect/logspout/).
 
 Expects to ingest JSON log lines, and will send JSON blobs up to Honeycomb, annotated with the current logspout stream, container, container ID, hostname, and docker image name.
 
