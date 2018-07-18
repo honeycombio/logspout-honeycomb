@@ -3,10 +3,12 @@ package honeycomb
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
 	"net"
 	"os"
 	"strconv"
+	"time"
 
 	"github.com/gliderlabs/logspout/router"
 	"github.com/honeycombio/libhoney-go"
@@ -95,6 +97,9 @@ func (a *HoneycombAdapter) Stream(logstream chan *router.Message) {
 			data = make(map[string]interface{})
 			data["message"] = m.Data
 		}
+
+		ev := libhoney.NewEvent()
+
 		// The message is already in JSON, add the docker specific fields.
 		data["stream"] = m.Source
 		data["logspout_container"] = m.Container.Name
@@ -102,8 +107,21 @@ func (a *HoneycombAdapter) Stream(logstream chan *router.Message) {
 		data["logspout_hostname"] = m.Container.Config.Hostname
 		data["logspout_docker_image"] = m.Container.Config.Image
 		data["router_hostname"] = hostname
+		if timeVal, ok := data["timestamp"]; ok {
+			ts, err := time.Parse(time.RFC3339Nano, timeVal.(string))
+			if err == nil {
+				// we got a valid timestamp. Override the event's timestamp and remove the
+				// field from data so we don't get it reported twice
+				ev.Timestamp = ts
+				delete(data, "timestamp")
+			} else {
+				ev.AddField("timestamp_error", fmt.Sprintf("problem parsing: %s", err))
+			}
+		}
 
-		if err := libhoney.SendNow(data); err != nil {
+		ev.Add(data)
+
+		if err := ev.Send(); err != nil {
 			log.Println("error: ", err)
 		}
 	}
