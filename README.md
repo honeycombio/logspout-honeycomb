@@ -31,7 +31,7 @@ Configure the logspout-honeycomb image via environment variables and run the con
         -e "HONEYCOMB_DATASET=<YOUR_DATASET>" \
         --volume=/var/run/docker.sock:/var/run/docker.sock \
         --publish=127.0.0.1:8000:80 \
-        honeycombio/logspout-honeycomb
+        honeycombio/logspout-honeycomb:1.13
 
 ### routesapi
 
@@ -40,7 +40,7 @@ Configuration can be set after the logspout-honeycomb image is already running v
     docker run \
         --volume=/var/run/docker.sock:/var/run/docker.sock \
         --publish=127.0.0.1:8000:80 \
-        honeycombio/logspout-honeycomb
+        honeycombio/logspout-honeycomb:1.13
 
     curl $(docker port `docker ps -lq` 80)/routes \
         -X POST \
