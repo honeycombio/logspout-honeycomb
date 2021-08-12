@@ -12,6 +12,8 @@ To build the Honeycomb Logspout Docker image, run:
 
 # Configuration and invocation
 
+[![OSS Lifecycle](https://img.shields.io/osslifecycle/honeycombio/REPO)](https://github.com/honeycombio/home/blob/main/honeycomb-oss-lifecycle-and-practices.md)
+
 This module can be configured either by setting environment variables in
 Docker, or by using the [Logspout routesapi](https://github.com/gliderlabs/logspout/tree/master/routesapi). The following variables are available:
 
