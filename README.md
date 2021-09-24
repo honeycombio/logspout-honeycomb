@@ -1,6 +1,6 @@
 # logspout-honeycomb
 
-[![OSS Lifecycle](https://img.shields.io/osslifecycle/honeycombio/logspout-honeycomb)](https://github.com/honeycombio/home/blob/main/honeycomb-oss-lifecycle-and-practices.md)
+[![OSS Lifecycle](https://img.shields.io/osslifecycle/honeycombio/logspout-honeycomb?color=success)](https://github.com/honeycombio/home/blob/main/honeycomb-oss-lifecycle-and-practices.md)
 
 Honeycomb adapter for Logspout. More documentation can be found [in Honeycomb docs](https://honeycomb.io/docs/connect/logspout/).
 
