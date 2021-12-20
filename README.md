@@ -2,7 +2,7 @@
 
 [![OSS Lifecycle](https://img.shields.io/osslifecycle/honeycombio/logspout-honeycomb?color=pink)](https://github.com/honeycombio/home/blob/main/honeycomb-oss-lifecycle-and-practices.md)
 
-**STATUS: this project is being sunset.** [See https://github.com/honeycombio/prom2hny/issues/5](https://github.com/honeycombio/logspout-honeycomb/issues/17)
+**STATUS: this project is being sunset.** [See https://github.com/honeycombio/logspout-honeycomb/issues/17](https://github.com/honeycombio/logspout-honeycomb/issues/17)
 
 Honeycomb adapter for Logspout. More documentation can be found [in Honeycomb docs](https://honeycomb.io/docs/connect/logspout/).
 
