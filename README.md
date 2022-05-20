@@ -1,8 +1,12 @@
 # logspout-honeycomb
 
-[![OSS Lifecycle](https://img.shields.io/osslifecycle/honeycombio/logspout-honeycomb?color=pink)](https://github.com/honeycombio/home/blob/main/honeycomb-oss-lifecycle-and-practices.md)
+[![OSS Lifecycle](https://img.shields.io/osslifecycle/honeycombio/logspout-honeycomb)](https://github.com/honeycombio/home/blob/main/honeycomb-oss-lifecycle-and-practices.md)
 
-**STATUS: this project is being sunset.** [See https://github.com/honeycombio/logspout-honeycomb/issues/17](https://github.com/honeycombio/logspout-honeycomb/issues/17)
+**STATUS: this project is [archived](https://github.com/honeycombio/home/blob/main/honeycomb-oss-lifecycle-and-practices.md).** Logspout users can use one of the [logspout third-party modules](https://github.com/gliderlabs/logspout#third-party-modules) that integrates with [logstash](/getting-data-in/logs/log-collectors/logstash) or [fluentd](/getting-data-in/logs/log-collectors/fluentd) to send logs to Honeycomb.
+
+Questions? You can chat with us in the **Honeycomb Pollinators** Slack. You can find a direct link to request an invite in [Spread the Love: Appreciating Our Pollinators Community](https://www.honeycomb.io/blog/spread-the-love-appreciating-our-pollinators-community/).
+
+---
 
 Honeycomb adapter for Logspout. More documentation can be found [in Honeycomb docs](https://honeycomb.io/docs/connect/logspout/).
 
